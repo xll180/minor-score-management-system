@@ -1,0 +1,73 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: minor-score-backend
+  # 数据源配置
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/minor_score?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: root
+    password: 123456
+  # 文件上传配置
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 100MB
+
+# MyBatis-Plus 配置
+mybatis-plus:
+  # 实体类包路径
+  type-aliases-package: com.minor.entity
+  # Mapper XML 文件路径
+  mapper-locations: classpath*:mapper/**/*.xml
+  # 全局配置
+  global-config:
+    db-config:
+      # 主键策略：雪花算法
+      id-type: assign_id
+      # 逻辑删除字段
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+  configuration:
+    # 日志输出
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    # 驼峰命名转换
+    map-underscore-to-camel-case: true
+
+# JWT 配置
+jwt:
+  # JWT 密钥 (请在生产环境中修改为复杂密钥)
+  secret: MinorScoreSystem2024SecretKeyForJWTTokenGenerationAndValidation
+  # Token 过期时间 (24小时，单位：毫秒)
+  expiration: 86400000
+  # Token 请求头名称
+  header: Authorization
+  # Token 前缀
+  token-prefix: "Bearer "
+
+# 讯飞星火大模型 API 配置
+xunfei:
+  spark:
+    # 讯飞星火API地址 (Lite版)
+    api-url: https://spark-api-open.xf-yun.com/v1/chat/completions
+    # API Key (请替换为你的实际API Key)
+    api-key: your-xunfei-spark-api-key
+    # API Secret
+    api-secret: your-xunfei-spark-api-secret
+    # 模型版本
+    model: lite
+    # 应用ID
+    app-id: your-xunfei-app-id
+
+# 导出文件存储路径
+export:
+  path: ./exports/
+
+# 日志配置
+logging:
+  level:
+    com.minor: debug
+    org.springframework.security: info
