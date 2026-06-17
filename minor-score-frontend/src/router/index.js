@@ -31,6 +31,7 @@ const routes = [
       { path: '', redirect: '/teacher/dashboard' },
       { path: 'dashboard', component: () => import('../views/teacher/Dashboard.vue'), meta: { title: '教师工作台' } },
       { path: 'course', component: () => import('../views/teacher/CourseManage.vue'), meta: { title: '课程管理' } },
+      { path: 'score-manage', component: () => import('../views/teacher/ScoreManage.vue'), meta: { title: '成绩管理' } },
       { path: 'score-import', component: () => import('../views/teacher/ScoreImport.vue'), meta: { title: '成绩导入' } },
       { path: 'report', component: () => import('../views/teacher/ReportView.vue'), meta: { title: '分析报告' } }
     ]

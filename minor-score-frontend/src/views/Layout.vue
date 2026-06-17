@@ -115,6 +115,7 @@ const adminMenuList = [
 const teacherMenuList = [
   { path: '/teacher/dashboard', title: '教师工作台', icon: HomeFilled },
   { path: '/teacher/course', title: '课程管理', icon: Reading },
+  { path: '/teacher/score-manage', title: '成绩管理', icon: Document },
   { path: '/teacher/score-import', title: '成绩导入', icon: Edit },
   { path: '/teacher/report', title: '分析报告', icon: TrendCharts }
 ]
