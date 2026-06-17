@@ -7,16 +7,18 @@
 USE minor_score;
 
 -- =============================================
--- 清空已有数据（按外键依赖顺序）
+-- 清空已有数据（按外键依赖顺序，TRUNCATE同时重置自增ID）
 -- =============================================
-DELETE FROM import_batch;
-DELETE FROM score;
-DELETE FROM course_selection;
-DELETE FROM course;
-DELETE FROM student;
-DELETE FROM teacher;
-DELETE FROM college;
-DELETE FROM admin;
+SET FOREIGN_KEY_CHECKS = 0;
+TRUNCATE TABLE import_batch;
+TRUNCATE TABLE score;
+TRUNCATE TABLE course_selection;
+TRUNCATE TABLE course;
+TRUNCATE TABLE student;
+TRUNCATE TABLE teacher;
+TRUNCATE TABLE college;
+TRUNCATE TABLE admin;
+SET FOREIGN_KEY_CHECKS = 1;
 
 -- =============================================
 -- 1. 管理员 (密码: admin123)
