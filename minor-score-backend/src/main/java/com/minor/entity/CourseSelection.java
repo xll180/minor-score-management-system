@@ -25,4 +25,10 @@ public class CourseSelection {
     private String studentNo;
     @TableField(exist = false)
     private String courseName;
+    @TableField(exist = false)
+    private String schedule;
+    @TableField(exist = false)
+    private String classroom;
+    @TableField(exist = false)
+    private String teacherName;
 }

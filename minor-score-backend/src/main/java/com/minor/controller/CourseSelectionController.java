@@ -1,13 +1,18 @@
 package com.minor.controller;
 
+import com.minor.entity.Course;
 import com.minor.entity.CourseSelection;
 import com.minor.entity.Student;
+import com.minor.entity.Teacher;
 import com.minor.service.CourseSelectionService;
+import com.minor.service.CourseService;
 import com.minor.service.StudentService;
+import com.minor.service.TeacherService;
 import com.minor.vo.Result;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -31,6 +36,18 @@ public class CourseSelectionController {
      */
     @Resource
     private StudentService studentService;
+
+    /**
+     * 课程Service
+     */
+    @Resource
+    private CourseService courseService;
+
+    /**
+     * 教师Service
+     */
+    @Resource
+    private TeacherService teacherService;
 
     /**
      * 学生选课
@@ -65,6 +82,37 @@ public class CourseSelectionController {
         List<CourseSelection> list = courseSelectionService.lambdaQuery()
                 .eq(CourseSelection::getStudentId, studentId)
                 .list();
+        // 填充课程信息
+        if (!list.isEmpty()) {
+            List<Long> courseIds = list.stream()
+                    .map(CourseSelection::getCourseId)
+                    .distinct()
+                    .collect(Collectors.toList());
+            Map<Long, Course> courseMap = courseService.listByIds(courseIds).stream()
+                    .collect(Collectors.toMap(Course::getId, c -> c));
+            // 收集所有教师ID，查询教师名称
+            List<Long> teacherIds = courseMap.values().stream()
+                    .map(Course::getTeacherId)
+                    .filter(id -> id != null)
+                    .distinct()
+                    .collect(Collectors.toList());
+            Map<Long, String> teacherMap = teacherIds.isEmpty()
+                    ? new HashMap<>()
+                    : teacherService.listByIds(teacherIds).stream()
+                            .collect(Collectors.toMap(Teacher::getId, Teacher::getRealName));
+            // 填充各字段
+            list.forEach(selection -> {
+                Course course = courseMap.get(selection.getCourseId());
+                if (course != null) {
+                    selection.setCourseName(course.getCourseName());
+                    selection.setSchedule(course.getSchedule());
+                    selection.setClassroom(course.getClassroom());
+                    if (course.getTeacherId() != null) {
+                        selection.setTeacherName(teacherMap.get(course.getTeacherId()));
+                    }
+                }
+            });
+        }
         return Result.success(list);
     }
 

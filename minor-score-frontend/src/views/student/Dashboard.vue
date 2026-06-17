@@ -60,8 +60,9 @@
       </template>
       <el-table :data="mySelections" stripe style="width: 100%">
         <el-table-column prop="courseName" label="课程名称" min-width="150" />
-        <el-table-column prop="studentNo" label="学号" width="120" />
-        <el-table-column prop="createTime" label="选课时间" width="170" />
+        <el-table-column prop="schedule" label="上课时间" width="120" />
+        <el-table-column prop="classroom" label="教室" width="100" />
+        <el-table-column prop="teacherName" label="授课老师" width="100" />
       </el-table>
       <el-empty v-if="mySelections.length === 0" description="暂未选课，快去选课中心吧！" />
     </el-card>
