@@ -1,9 +1,11 @@
 package com.minor.controller;
 
+import com.minor.entity.College;
 import com.minor.entity.Score;
 import com.minor.entity.Student;
 import com.minor.mapper.ScoreMapper;
 import com.minor.mapper.StudentMapper;
+import com.minor.service.CollegeService;
 import com.minor.service.CourseService;
 import com.minor.service.ScoreService;
 import com.minor.service.StudentService;
@@ -35,6 +37,9 @@ public class StatisticsController {
 
     @Resource
     private ScoreService scoreService;
+
+    @Resource
+    private CollegeService collegeService;
 
     @Resource
     private ScoreMapper scoreMapper;
@@ -151,17 +156,17 @@ public class StatisticsController {
         // 查询所有学生
         List<Student> studentList = studentMapper.selectList(null);
 
+        // 查询所有学院，构建ID->名称映射
+        Map<Long, String> collegeNameMap = new LinkedHashMap<>();
+        collegeService.list().forEach(college ->
+                collegeNameMap.put(college.getId(), college.getCollegeName()));
+
         // 按学院ID分组统计人数
         Map<Long, Integer> collegeCountMap = new LinkedHashMap<>();
-        Map<Long, String> collegeNameMap = new LinkedHashMap<>();
-
         for (Student student : studentList) {
             Long collegeId = student.getCollegeId();
             if (collegeId != null) {
                 collegeCountMap.put(collegeId, collegeCountMap.getOrDefault(collegeId, 0) + 1);
-                if (student.getCollegeName() != null) {
-                    collegeNameMap.put(collegeId, student.getCollegeName());
-                }
             }
         }
 

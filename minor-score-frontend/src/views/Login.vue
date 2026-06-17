@@ -54,14 +54,7 @@
           </el-button>
         </el-form-item>
       </el-form>
-      
-      <!-- 默认账号提示 -->
-      <div class="login-tips">
-        <p>默认账号：</p>
-        <p>管理员：admin / admin123</p>
-        <p>教师：teacher1 / 123456</p>
-        <p>学生：student1 / 123456</p>
-      </div>
+
     </div>
   </div>
 </template>

@@ -2,7 +2,9 @@ package com.minor.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.minor.entity.College;
 import com.minor.entity.Teacher;
+import com.minor.service.CollegeService;
 import com.minor.service.TeacherService;
 import com.minor.vo.Result;
 import jakarta.annotation.Resource;
@@ -10,7 +12,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 教师管理控制器
@@ -25,6 +29,12 @@ public class TeacherController {
      */
     @Resource
     private TeacherService teacherService;
+
+    /**
+     * 学院Service
+     */
+    @Resource
+    private CollegeService collegeService;
 
     /**
      * 密码编码器，用于BCrypt加密
@@ -44,8 +54,26 @@ public class TeacherController {
                                             @RequestParam(defaultValue = "10") Integer size) {
         IPage<Teacher> iPage = new Page<>(page, size);
         IPage<Teacher> result = teacherService.page(iPage);
+        // 填充学院名称
+        List<Teacher> records = result.getRecords();
+        if (!records.isEmpty()) {
+            List<Long> collegeIds = records.stream()
+                    .map(Teacher::getCollegeId)
+                    .filter(id -> id != null)
+                    .distinct()
+                    .collect(Collectors.toList());
+            if (!collegeIds.isEmpty()) {
+                Map<Long, String> collegeMap = collegeService.listByIds(collegeIds).stream()
+                        .collect(Collectors.toMap(College::getId, College::getCollegeName));
+                records.forEach(teacher -> {
+                    if (teacher.getCollegeId() != null) {
+                        teacher.setCollegeName(collegeMap.get(teacher.getCollegeId()));
+                    }
+                });
+            }
+        }
         Map<String, Object> map = new HashMap<>();
-        map.put("records", result.getRecords());
+        map.put("records", records);
         map.put("total", result.getTotal());
         map.put("current", result.getCurrent());
         map.put("size", result.getSize());

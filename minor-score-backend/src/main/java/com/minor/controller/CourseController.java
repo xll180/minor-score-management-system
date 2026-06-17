@@ -2,8 +2,12 @@ package com.minor.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.minor.entity.College;
 import com.minor.entity.Course;
+import com.minor.entity.Teacher;
+import com.minor.service.CollegeService;
 import com.minor.service.CourseService;
+import com.minor.service.TeacherService;
 import com.minor.vo.Result;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 课程管理控制器
@@ -27,6 +32,18 @@ public class CourseController {
     private CourseService courseService;
 
     /**
+     * 教师Service
+     */
+    @Resource
+    private TeacherService teacherService;
+
+    /**
+     * 学院Service
+     */
+    @Resource
+    private CollegeService collegeService;
+
+    /**
      * 分页查询所有课程列表
      *
      * @param page 当前页码
@@ -38,8 +55,40 @@ public class CourseController {
                                             @RequestParam(defaultValue = "10") Integer size) {
         IPage<Course> iPage = new Page<>(page, size);
         IPage<Course> result = courseService.page(iPage);
+        // 填充教师名称和学院名称
+        List<Course> records = result.getRecords();
+        if (!records.isEmpty()) {
+            // 填充教师名称
+            List<Long> teacherIds = records.stream()
+                    .map(Course::getTeacherId)
+                    .filter(id -> id != null)
+                    .distinct()
+                    .collect(Collectors.toList());
+            Map<Long, String> teacherMap = teacherIds.isEmpty()
+                    ? new HashMap<>()
+                    : teacherService.listByIds(teacherIds).stream()
+                            .collect(Collectors.toMap(Teacher::getId, Teacher::getRealName));
+            // 填充学院名称
+            List<Long> collegeIds = records.stream()
+                    .map(Course::getCollegeId)
+                    .filter(id -> id != null)
+                    .distinct()
+                    .collect(Collectors.toList());
+            Map<Long, String> collegeMap = collegeIds.isEmpty()
+                    ? new HashMap<>()
+                    : collegeService.listByIds(collegeIds).stream()
+                            .collect(Collectors.toMap(College::getId, College::getCollegeName));
+            records.forEach(course -> {
+                if (course.getTeacherId() != null) {
+                    course.setTeacherName(teacherMap.get(course.getTeacherId()));
+                }
+                if (course.getCollegeId() != null) {
+                    course.setCollegeName(collegeMap.get(course.getCollegeId()));
+                }
+            });
+        }
         Map<String, Object> map = new HashMap<>();
-        map.put("records", result.getRecords());
+        map.put("records", records);
         map.put("total", result.getTotal());
         map.put("current", result.getCurrent());
         map.put("size", result.getSize());
