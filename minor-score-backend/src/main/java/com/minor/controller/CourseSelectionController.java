@@ -1,13 +1,16 @@
 package com.minor.controller;
 
 import com.minor.entity.CourseSelection;
+import com.minor.entity.Student;
 import com.minor.service.CourseSelectionService;
+import com.minor.service.StudentService;
 import com.minor.vo.Result;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 选课管理控制器
@@ -22,6 +25,12 @@ public class CourseSelectionController {
      */
     @Resource
     private CourseSelectionService courseSelectionService;
+
+    /**
+     * 学生Service
+     */
+    @Resource
+    private StudentService studentService;
 
     /**
      * 学生选课
@@ -70,6 +79,22 @@ public class CourseSelectionController {
         List<CourseSelection> list = courseSelectionService.lambdaQuery()
                 .eq(CourseSelection::getCourseId, courseId)
                 .list();
+        // 填充学生信息
+        if (!list.isEmpty()) {
+            List<Long> studentIds = list.stream()
+                    .map(CourseSelection::getStudentId)
+                    .distinct()
+                    .collect(Collectors.toList());
+            Map<Long, Student> studentMap = studentService.listByIds(studentIds).stream()
+                    .collect(Collectors.toMap(Student::getId, s -> s));
+            list.forEach(selection -> {
+                Student student = studentMap.get(selection.getStudentId());
+                if (student != null) {
+                    selection.setStudentNo(student.getStudentNo());
+                    selection.setStudentName(student.getRealName());
+                }
+            });
+        }
         return Result.success(list);
     }
 
