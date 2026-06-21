@@ -9,12 +9,11 @@ import com.minor.service.StudentService;
 import com.minor.vo.Result;
 import jakarta.annotation.Resource;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * 学生管理控制器
@@ -41,6 +40,42 @@ public class StudentController {
      */
     @Resource
     private PasswordEncoder passwordEncoder;
+    @GetMapping("/profile")
+    public Result<Student> getProfile() {
+        Object credentials = SecurityContextHolder.getContext().getAuthentication().getCredentials();
+        Long userId = Long.valueOf(credentials.toString());
+        Student student = studentService.getById(userId);
+        if (student == null) {
+            return Result.error("学生不存在");
+        }
+        if (student.getCollegeId() != null) {
+            College college = collegeService.getById(student.getCollegeId());
+            if (college != null) {
+                student.setCollegeName(college.getCollegeName());
+            }
+        }
+        student.setPassword(null);
+        return Result.success(student);
+    }
+
+    @PutMapping("/profile")
+    public Result<String> updateProfile(@RequestBody Student studentUpdate) {
+        Object credentials = SecurityContextHolder.getContext().getAuthentication().getCredentials();
+        Long userId = Long.valueOf(credentials.toString());
+        Student updateEntity = new Student();
+        updateEntity.setId(userId);
+        if (studentUpdate.getRealName() != null) updateEntity.setRealName(studentUpdate.getRealName());
+        if (studentUpdate.getGender() != null) updateEntity.setGender(studentUpdate.getGender());
+        if (studentUpdate.getPhone() != null) updateEntity.setPhone(studentUpdate.getPhone());
+        if (studentUpdate.getEmail() != null) updateEntity.setEmail(studentUpdate.getEmail());
+        boolean updated = studentService.updateById(updateEntity);
+        if (updated) {
+            return Result.success("更新成功");
+        }
+        return Result.error("更新失败");
+    }
+
+
 
     /**
      * 分页查询所有学生列表
@@ -54,26 +89,8 @@ public class StudentController {
                                             @RequestParam(defaultValue = "10") Integer size) {
         IPage<Student> iPage = new Page<>(page, size);
         IPage<Student> result = studentService.page(iPage);
-        // 填充学院名称
-        List<Student> records = result.getRecords();
-        if (!records.isEmpty()) {
-            List<Long> collegeIds = records.stream()
-                    .map(Student::getCollegeId)
-                    .filter(id -> id != null)
-                    .distinct()
-                    .collect(Collectors.toList());
-            if (!collegeIds.isEmpty()) {
-                Map<Long, String> collegeMap = collegeService.listByIds(collegeIds).stream()
-                        .collect(Collectors.toMap(College::getId, College::getCollegeName));
-                records.forEach(student -> {
-                    if (student.getCollegeId() != null) {
-                        student.setCollegeName(collegeMap.get(student.getCollegeId()));
-                    }
-                });
-            }
-        }
         Map<String, Object> map = new HashMap<>();
-        map.put("records", records);
+        map.put("records", result.getRecords());
         map.put("total", result.getTotal());
         map.put("current", result.getCurrent());
         map.put("size", result.getSize());

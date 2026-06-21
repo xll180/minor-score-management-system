@@ -33,7 +33,8 @@ const routes = [
       { path: 'course', component: () => import('../views/teacher/CourseManage.vue'), meta: { title: '课程管理' } },
       { path: 'score-manage', component: () => import('../views/teacher/ScoreManage.vue'), meta: { title: '成绩管理' } },
       { path: 'score-import', component: () => import('../views/teacher/ScoreImport.vue'), meta: { title: '成绩导入' } },
-      { path: 'report', component: () => import('../views/teacher/ReportView.vue'), meta: { title: '分析报告' } }
+      { path: 'report', component: () => import('../views/teacher/ReportView.vue'), meta: { title: '分析报告' } },
+      { path: 'profile', component: () => import('../views/teacher/Profile.vue'), meta: { title: '个人资料' } },
     ]
   },
   {
@@ -44,7 +45,8 @@ const routes = [
       { path: '', redirect: '/student/dashboard' },
       { path: 'dashboard', component: () => import('../views/student/Dashboard.vue'), meta: { title: '学生首页' } },
       { path: 'course-select', component: () => import('../views/student/CourseSelect.vue'), meta: { title: '选课中心' } },
-      { path: 'my-score', component: () => import('../views/student/MyScore.vue'), meta: { title: '我的成绩' } }
+      { path: 'my-score', component: () => import('../views/student/MyScore.vue'), meta: { title: '我的成绩' } },
+      { path: 'profile', component: () => import('../views/student/Profile.vue'), meta: { title: '个人资料' } },
     ]
   }
 ]
