@@ -117,14 +117,16 @@ const teacherMenuList = [
   { path: '/teacher/course', title: '课程管理', icon: Reading },
   { path: '/teacher/score-manage', title: '成绩管理', icon: Document },
   { path: '/teacher/score-import', title: '成绩导入', icon: Edit },
-  { path: '/teacher/report', title: '分析报告', icon: TrendCharts }
+  { path: '/teacher/report', title: '分析报告', icon: TrendCharts },
+  { path: '/teacher/profile', title: '个人资料', icon: User },
 ]
 
 // 学生菜单
 const studentMenuList = [
   { path: '/student/dashboard', title: '学生首页', icon: HomeFilled },
   { path: '/student/course-select', title: '选课中心', icon: Collection },
-  { path: '/student/my-score', title: '我的成绩', icon: Tickets }
+  { path: '/student/my-score', title: '我的成绩', icon: Tickets },
+  { path: '/student/profile', title: '个人资料', icon: User },
 ]
 
 // 根据角色获取菜单列表

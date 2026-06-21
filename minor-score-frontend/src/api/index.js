@@ -60,6 +60,12 @@ export const getImportBatches = (courseId) => request.get(`/report/batches/${cou
 export const exportWord = (batchId) => request.get(`/export/word/${batchId}`, { responseType: 'blob' })
 export const exportPdf = (batchId) => request.get(`/export/pdf/${batchId}`, { responseType: 'blob' })
 
+
+// ============ 个人资料接口 ============
+export const getTeacherProfile = () => request.get('/teacher/profile')
+export const updateTeacherProfile = (data) => request.put('/teacher/profile', data)
+export const getStudentProfile = () => request.get('/student/profile')
+export const updateStudentProfile = (data) => request.put('/student/profile', data)
 // ============ 统计接口 ============
 export const getDashboardStats = () => request.get('/statistics/dashboard')
 export const getScoreDistribution = (courseId) => request.get(`/statistics/score-distribution/${courseId}`)
